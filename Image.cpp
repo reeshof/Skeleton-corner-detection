@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <fstream>
 #include <set>
-#include "include/ImageWriter.hpp"
+
 #include "include/skeleton_cuda.hpp"
 #include "include/connected.hpp"
 #include "include/messages.h"
@@ -565,58 +565,6 @@ void Image::removeLayers() {
     
 }
 
-void draw_path(int intensity, FIELD<float>* image, skel_tree_t *st, uint16_t pLength, bool rightMost) {
-    /* Not a leaf, does it have exactly 1 child (is it a continuous path?) ?*/
-    if (st->numChildren() == 0) {
-        Triple<int, int, int> p = st->getValue();
-        image->set(p.first, p.second, intensity);
-    }
-
-    if (st->numChildren() == 1) {
-        Triple<int, int, int> p = st->getValue();
-        image->set(p.first, p.second, intensity);
-        // add_to_hist(st->getValue(), st->getChild(0)->getValue());
-        draw_path(intensity, image, st->getChild(0), pLength + 1, rightMost);
-        return;
-    }
-
-    /* Fork coming up! */
-    if (st->numChildren() > 1) {
-        /* All "non-rightmost" children: */
-        auto cur = st->getValue();
-        image->set(cur.first, cur.second, intensity);
-
-        for (int i = 0; i < (st->numChildren() - 1) ; ++i) {
-            draw_path(intensity, image, st->getChild(i), 1, false);
-        }
-        /* Treat rightmost child different, pass a longer path length, so it jumps back further after being done with the last branch. */
-        // add_to_hist(cur, st->getChild(st->numChildren() - 1)->getValue());
-        draw_path(intensity, image, st->getChild(st->numChildren() - 1), 1 + pLength, rightMost);
-    }
-}
-
-
-void draw_layer(int intensity, skel_tree_t* trees, FIELD<float>* image) {
-    /* Remove overhead for empty layers. */
-    if (trees->numChildren() == 0) { return; }
-
-    /* Top layer are disjunct paths. Treat them as separate objects */
-    for (int child = 0; child < trees->numChildren(); ++child) {
-        skel_tree_t *curnode = (*trees)[child];
-        draw_path(intensity, image, curnode, /*pLength = */1, /*rightMost = */true);
-    }
-}
-
-void draw_skeletons(int szx, int szy, vector<std::pair<int, skel_tree_t*>>* forest) {
-    FIELD<float>   *overlapped = new FIELD<float>(szx, szy);
-    for (auto elem = forest->begin(); elem != forest->end(); ++elem) {
-        int intensity = elem->first;
-        skel_tree_t* trees = elem->second;
-        draw_layer(intensity, trees, overlapped);
-    }
-    overlapped->writePGM("skeletons.pgm");
-}
-
 coord2D_list_t* neighbours(int x, int y, FIELD<float>* skel) {
     coord2D_list_t* neigh = new coord2D_list_t();
     int n[8] = { 1, 1, 1, 1, 1, 1, 1, 1 };
@@ -955,11 +903,11 @@ SkelEngine* perform_skeletonization(int level, FIELD<float>* upper_level_set, bo
                 xm = min(xm, i); ym = min(ym, j);
                 xM = max(xM, i); yM = max(yM, j);
             }
-    //xM = nx - 1; yM = ny - 1;//orginal method, which cause artifacts.
-    xM = nx;//(xm == nx) ? (nx - 1) : nx;//must run before xm=...
-    yM = ny;//(xm == nx) ? (ny - 1) : ny;
-    xm = 0;//(xm == 0) ? 0 : (xm - 1); // In this way, we further expand the boundary, which avoid producing artifacts.
-    ym = 0;//(ym == 0) ? 0 : (ym - 1);
+
+    xM = nx;
+    yM = ny;
+    xm = 0;
+    ym = 0;
 
     SkelEngine* skel = new SkelEngine();
 
@@ -969,59 +917,9 @@ SkelEngine* perform_skeletonization(int level, FIELD<float>* upper_level_set, bo
     skel->compute(threshold);
 
     delete[] image;
-    //upper_level_set->writePGM(string("temp_images/t-" + to_string(level) + ".pgm").c_str());
- 
-    //skel_curr->writePGM(string("temp_images/skel-" + to_string(level) + ".pgm").c_str());
-     
-    //upper_level_set->writePGM(string("temp_images/dt-" + to_string(level) + ".pgm").c_str());
-  
-    //auto skelft = skelft_to_field();  ////wang // To avoid the error in this function. ox = -1;//furthermore, I do not know what is the use of this line.
-   
-    //if (skelft)
-    //    skelft->writePGM(string("temp_images/skelft-" + to_string(level) + ".pgm").c_str());
    
     return skel;
 }
-
-void removeSmallPaths(skel_tree_t *st) {
-    if (st->numChildren() > 1) {
-        for (int i = 0; i < st->numChildren() && st->numChildren() > 1; ++i) {
-            if (st->getChild(i)->numRChildren() < MIN_PATH_LENGTH || st->getChild(i)->importance() < MIN_SUM_RADIUS) {
-                st->removeRChild(i);
-                --i;
-            }
-        }
-    }
-
-    for (int i = 0; i < st->numChildren(); ++i) {
-        removeSmallPaths(st->getChild(i));
-    }
-}
-
-
-void removeSmallObjects(skel_tree_t *st) {
-    for (int i = 0; i < st->numChildren(); ++i) {
-        if (st->getChild(i)->numRChildren() < MIN_OBJECT_SIZE || st->getChild(i)->importance() < MIN_SUM_RADIUS) {
-            st->removeRChild(i);
-            --i;
-        }
-    }
-}
-
-/* Due to some preprocessing steps which simplify the skeleton we could generate "new points", Points which are
- actually outside of an object may now become skeleton points (e.g. by dilation). These points have a radius of
- 0. If these points are at the end of a skeleton path, we can safely remove them.*/
-void removeInvisibleEndpoints(skel_tree_t *st) {
-    for (int i = 0; i < st->numChildren(); ++i) {
-        removeInvisibleEndpoints(st->getChild(i));
-
-        if (st->getChild(i)->numRChildren() == 0 && st->getChild(i)->getValue().third == 0) {
-            st->removeRChild(i);
-            --i;
-        }
-    }
-}
-
 
 void Image::collectEndpoints(int *firstLayer, FIELD<std::vector<cornerData>>& skeletonEndpoints, FIELD<float>& skeletonEndpoints2, float saliency, float stepSize) {
     for (int i = 1; i < 256; i = i + stepSize) {
@@ -1080,133 +978,3 @@ void Image::collectEndpoints(int *firstLayer, FIELD<std::vector<cornerData>>& sk
     }
 }
 
-
-
-/*if (i >= tempT) {
-            auto skelft = skelE->getFtField();
-            auto dupeSkel = imp1->dupe();
-            cv::Mat test = cv::Mat(dupeSkel->dimY(), dupeSkel->dimX(), CV_32FC1, dupeSkel->data());
-
-            double min, max;
-            cv::Point min_loc, max_loc;
-            cv::minMaxLoc(test, &min, &max, &min_loc, &max_loc);
-
-            std::cout << "Showing image, max value: " << max << std::endl;
-
-            test /= max;//normalize for better visualisation
-
-            cv::imshow("extremalRegions", test);
-
-            cv::waitKey();
-
-            //findLargestComponent(imThreshold, imp1);
-        }
-
-        if (i >= 445) {
-            auto dupeSkel = skel1->dupe();
-            cv::Mat test = cv::Mat(dupeSkel->dimY(), dupeSkel->dimX(), CV_32FC1, dupeSkel->data());
-
-            double min, max;
-            cv::Point min_loc, max_loc;
-            cv::minMaxLoc(test, &min, &max, &min_loc, &max_loc);
-            //std::cout << cv::sum(test)[0] << std::endl;
-            //std::cout << "Showing image, max value: " << max << std::endl;
-
-            test /= max;//normalize for better visualisation
-
-            cv::imshow("extremalRegions", test);
-
-            int key = cv::waitKey();
-
-            if (key == 'k') {
-                auto skel_ft2 = imThreshold->dupe();
-                showImage(*skel_ft2, "cross", "cross", "siteLabels2", false, false, true);
-                cv::waitKey();
-            }
-
-            delete dupeSkel;
-        }
-
-        if (i >= 441) {
-            // cv::Mat test1 = cv::Mat(endpoints1->dimY(), endpoints1->dimX(), CV_32FC1, endpoints1->data());
-            auto skelft = skelE->getFtField();
-            cv::Mat test1 = cv::Mat(skelft->dimY(), skelft->dimX(), CV_32FC1, skelft->data());
-            auto dupeSkel = skel1->dupe();
-            cv::Mat test = cv::Mat(dupeSkel->dimY(), dupeSkel->dimX(), CV_32FC1, dupeSkel->data());
-
-            double min, max;
-            cv::Point min_loc, max_loc;
-            cv::minMaxLoc(test, &min, &max, &min_loc, &max_loc);
-            test /= max;
-
-            cv::threshold(test1, test1, 0, 1, cv::THRESH_BINARY);
-            test1 /= 2;
-
-            test += test1;
-
-            cv::minMaxLoc(test, &min, &max, &min_loc, &max_loc);
-
-            showImage(test, "thresholdLayers", "Skeletons", "Skeletons", true, false, true);
-        }
-
-        //simplified skeletons with core components 
-        if (!setDirectories.empty()) {
-            // cv::Mat test1 = cv::Mat(endpoints1->dimY(), endpoints1->dimX(), CV_32FC1, endpoints1->data());
-            auto skelft = imThreshold->dupe();
-            cv::Mat test1 = cv::Mat(skelft->dimY(), skelft->dimX(), CV_32FC1, skelft->data());
-            auto dupeSkel = skel1->dupe();
-            cv::Mat test = cv::Mat(dupeSkel->dimY(), dupeSkel->dimX(), CV_32FC1, dupeSkel->data());
-
-            double min, max;
-            cv::Point min_loc, max_loc;
-            cv::minMaxLoc(test, &min, &max, &min_loc, &max_loc);
-            test /= max;
-
-            cv::minMaxLoc(test1, &min, &max, &min_loc, &max_loc);
-            test1 /= max;
-            //test1 /= 2;
-
-            test /= 2;
-            test1 -= test;
-            //test = cv::max(test, test1);
-
-            cv::minMaxLoc(test1, &min, &max, &min_loc, &max_loc);
-
-            showImage(test1, setDirectories[1], to_string(i), "", false, true, true);
-        }
-
-        //extremal regions
-        if (!setDirectories.empty()) {
-            auto dupeSkel = imThreshold->dupe();
-            cv::Mat test = cv::Mat(dupeSkel->dimY(), dupeSkel->dimX(), CV_32FC1, dupeSkel->data());
-
-            double min, max;
-            cv::Point min_loc, max_loc;
-            cv::minMaxLoc(test, &min, &max, &min_loc, &max_loc);
-
-            test /= max;//normalize for better visualisation
-
-            showImage(*dupeSkel, setDirectories[0], to_string(i), "", false, true, false);
-        }
-
-        //threshold sets with location of endpoints
-        if (i >= 441) {//!setDirectories.empty()) {
-            imThreshold = im->dupe();
-            imThreshold->thresholdInv(i);
-            cv::Mat test = cv::Mat(imThreshold->dimY(), imThreshold->dimX(), CV_32FC1, imThreshold->data());
-            double min, max;
-            cv::Point min_loc, max_loc;
-            cv::minMaxLoc(test, &min, &max, &min_loc, &max_loc);
-
-            showImage(*imThreshold, "", "Extremal regions", "Extremal regions", true, false, false);
-            showImage(*imThreshold, endPoints, "", "test", true, false, endPoints.size());
-            //showImage(*imThreshold, endPoints, setDirectories[2], to_string(i), false, true, endPoints.size());
-        }
-
-        if (i == 1116) {
-            std::cout << startPoints.size() << " | " << startPoints[0].first << "/" << startPoints[0].second << std::endl;
-            for (auto startPoint : startPoints) {
-                std::cout << startPoint.first << "|" << startPoint.second << std::endl;
-            }
-        }
-*/

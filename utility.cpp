@@ -1,16 +1,12 @@
 #include <opencv2/opencv.hpp>
-#include "include/utility.h"
-#include <opencv2/features2d.hpp>
 
 #include "shared/CUDASkel2D/include/field.h"
-#include "include/image.hpp"
-#include "include/metrics.h"
-
-//#include "include/image.h"
+#include "include/utility.h"
 #include "include/Node.hpp"
 #include "include/connected.hpp"
 #include "include/evaluation.h"
 #include "include/cornerDetector.h"
+#include "include/metrics.h"
 #include <direct.h>
 
 void writeHomography(ostream& output, cv::Mat& h) {
@@ -65,38 +61,6 @@ cv::Mat readHomography(std::string& filename) {
 void makeUINTarray(float* oldarray, char* newArray, int arraySize) {
 	for (int i = 0; i < arraySize; i++) {
 		newArray[i] = (char)oldarray[i];
-	}
-}
-
-void checkNodeForEndpoint(skel_tree_t* node, FIELD<float>& skeletonEndpoints) {
-	int nChildren = node->numChildren();
-
-	if (nChildren == 0) {//found a skeleton endpoint
-		auto nodeValue = node->getValue();
-		skeletonEndpoints.value(nodeValue.first, nodeValue.second)++;
-		return;
-	}
-
-	for (int i = 0; i < nChildren; i++) {//travel through the tree
-		checkNodeForEndpoint(node->getChild(i), skeletonEndpoints);
-	}
-}
-
-void addSkeletonEndpoints(vector<std::pair<int, skel_tree_t*>>* forest, FIELD<float>& skeletonEndpoints) {
-	std::cout << "Finding the skeleton endPoints from the forest..." << std::endl;
-
-	for (int i = 0; i < forest->size(); i++) {//each element of forest contains the single skeleton of a threshold layer
-		skel_tree_t* layer_skeleton = forest->at(i).second;//the layer skeleton represents the root node (-1,-1,-1)
-
-		for (int j = 0; j < layer_skeleton->numChildren(); j++) {//Each child of the root note is the first skeleton point of an extremal region, thus numChildren = num extremal regions (connected components)
-			skel_tree_t* child = layer_skeleton->getChild(j);
-			if (child->numChildren() == 1) {//The first child of the root node is a skeleton endPoint if it has only 1 child
-				auto nodeValue = child->getValue();//x,y,dt
-				skeletonEndpoints.value(nodeValue.first, nodeValue.second)++;//count it as one skeleton endpoint
-			}
-
-			checkNodeForEndpoint(child, skeletonEndpoints);
-		}
 	}
 }
 
@@ -207,8 +171,6 @@ void showImage(cv::Mat& image, string directory, string name, string description
 
 	float avg = cv::mean(test, test > 0)[0];
 
-	std::cout << "Showing " << description << " image, max value: " << max << " | avg = " << avg << std::endl;
-
 	cv::normalize(test, test, 0, 255, cv::NORM_MINMAX);
 
 	cv::Mat test2;
@@ -242,7 +204,7 @@ cv::Mat colorCodeImage(cv::Mat& image, int rows, int cols) {
 }
 
 void showImage(FIELD<float>& image, string directory, string name, string description, bool show, bool writeImage, bool colorCode) {
-	FIELD<float>* dupeImage = image.dupe();//Clone image so that the data does not get removed by cv::Mat (not entirely sure if it does or not
+	FIELD<float>* dupeImage = image.dupe();
 
 	cv::Mat test = cv::Mat(image.dimY(), image.dimX(), CV_32F, dupeImage->data());
 
@@ -250,7 +212,6 @@ void showImage(FIELD<float>& image, string directory, string name, string descri
 	cv::Point min_loc, max_loc;
 	cv::minMaxLoc(test, &min, &max, &min_loc, &max_loc);
 	float avg = cv::mean(test, test > 0)[0];
-	std::cout << "Showing image " << name << ", max value: " << max << " | avg = " << avg << std::endl;
 	cv::normalize(test, test, 0, 255,cv::NORM_MINMAX);
 
 	cv::Mat test2;

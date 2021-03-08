@@ -2,8 +2,6 @@
 #include "include/skeletonTracer.h"
 #include <vector>
 
-#include "include/ImageWriter.hpp"//for coord2D_t
-
 #include <limits>
 #include <queue>
 #include <stack>
@@ -324,56 +322,6 @@ std::vector<cv::Point2f> tracer::traceSkeleton() {
         }
     }
 
-    //Getting information from the created skeleton tree, containing endpoints and junctures
-    std::vector<float> componentSize;//total length of the skeleton
-    std::vector<int> endPointsInComponent;
-
-    std::vector<int> isVisited(nodeLabels.size(), -1);
-    auto nextNode = std::find(isVisited.begin(), isVisited.end(), -1);
-
-    while (nextNode != isVisited.end()) {
-        componentSize.push_back(0);
-        endPointsInComponent.push_back(0);
-        int indexOfComponent = componentSize.size() - 1;
-
-        int index = std::distance(isVisited.begin(), nextNode);//get the index location of the newfound node
-        isVisited[index] = indexOfComponent;
-        float totalDistance = 0;
-
-        if (get<0>(nodeLabels[index]) == 1)
-            ++endPointsInComponent[indexOfComponent];
-
-        std::queue<int> exploredNodes;
-
-        for (const auto edge : treeNodes[index]) {
-            totalDistance += get<2>(edge);
-            if (isVisited[get<1>(edge)] == -1) {
-                exploredNodes.push(get<1>(edge));
-                isVisited[get<1>(edge)] = indexOfComponent;
-                if (get<0>(nodeLabels[get<1>(edge)]) == 1)
-                    ++endPointsInComponent[indexOfComponent];
-            }
-        }
-
-        while (!exploredNodes.empty()) {
-            int newNode = exploredNodes.front();
-            exploredNodes.pop();
-
-            for (const auto edge : treeNodes[newNode]) {
-                totalDistance += get<2>(edge);
-                if (isVisited[get<1>(edge)] == -1) {
-                    exploredNodes.push(get<1>(edge));
-                    isVisited[get<1>(edge)] = indexOfComponent;
-                    if (get<0>(nodeLabels[get<1>(edge)]) == 1)
-                        ++endPointsInComponent[indexOfComponent];
-                }
-            }
-        }
-
-        componentSize[indexOfComponent] = totalDistance/2.0f;//each edge will be counted twice
-        nextNode = std::find(isVisited.begin(), isVisited.end(), -1);
-    }
-
     //Go through all the endpoints
     std::vector<cv::Point2f> endPoints;
     for (int i = 0; i < nodeLabels.size(); ++i) {
@@ -393,7 +341,6 @@ std::vector<cv::Point2f> tracer::traceSkeleton() {
                 std::cout << "something wrong 1" << "\n";
             int label = get<0>(nodeLabels[get<1>(edges[0])]);
             distance += get<2>(edges[0]);
-            //branchLength += get<2>()
 
             edges = treeNodes[get<1>(edges[0])];
             if(label == -1 && edges.size() == 2) {
@@ -403,21 +350,20 @@ std::vector<cv::Point2f> tracer::traceSkeleton() {
                     }
                 }
             }
+
             float currentNormDt;
             if (distance == 0) currentNormDt = 0;
             else  currentNormDt = currentDt / distance;
-            float currentObjectSizeNorm = distance / componentSize[isVisited[i]];
-            float currentObjectEndpoints = endPointsInComponent[isVisited[i]];
 
+            //use addSkeletonPoint for the endpoint to be adjusted to the boundary
             //std::pair<int,int> adjustedCorner = addSkeletonPoint(x, y, skel, dt, skeletonEndpoints2, -10, skelE).first;
             std::pair<int, int> adjustedCorner = { x,y };
 
             if (!(adjustedCorner.first < 10 || adjustedCorner.first > skel->dimX() - 10 || adjustedCorner.second < 10 || adjustedCorner.second > skel->dimY() - 10)) {
-                cornerData newData{ adjustedCorner.first,adjustedCorner.second,currentSaliency,currentNormDt,currentObjectSizeNorm,currentObjectEndpoints,distance };
-
+                cornerData newData{ adjustedCorner.first,adjustedCorner.second,currentSaliency,currentNormDt,0,0,distance };
                 skeletonEndpoints.value(adjustedCorner.first, adjustedCorner.second).push_back(newData);
+                
                 ++skeletonEndpoints2.value(adjustedCorner.first, adjustedCorner.second);
-
                 endPoints.push_back({ (float)adjustedCorner.first, (float)adjustedCorner.second });
             }
         }

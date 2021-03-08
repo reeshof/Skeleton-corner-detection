@@ -21,7 +21,7 @@ private:
 protected:
 	cornerDetector(const std::string& name, int nCorners, bool showImage) : name_(name), nCorners_(nCorners), showImage_(showImage) {};
 
-	static std::vector<cv::KeyPoint> findLocalMax(FIELD<float>& image);
+	static std::vector<cv::KeyPoint> findLocalMax(FIELD<float>& image, const cv::Size& nmsSize);
 	static std::vector<cv::KeyPoint> nms(const cv::Mat& image, std::vector<cv::KeyPoint>& keypoints, const cv::Size& nmsSize);
 
 	const std::string name_;
@@ -77,7 +77,7 @@ public:
 
 private:
 	FIELD<float>* convertMatField(const cv::Mat& matImage) const;
-	std::vector<cv::KeyPoint> findKeypoints(const cv::Mat& image) const ;
+	std::vector<cv::KeyPoint> findKeypoints(const cv::Mat& image, const cv::Size& nmsSize) const ;
 
 	const float saliency_;
 	const float tau_;

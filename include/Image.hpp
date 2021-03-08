@@ -3,9 +3,12 @@
 
 #include "../shared/CUDASkel2D/include/field.h"
 #include "shared/CUDASkel2D/include/skelcomp.h"
-#include "ImageWriter.hpp"
+
 #include <set>
 #include <vector>
+
+typedef std::pair<int, int> coord2D_t;
+typedef vector<coord2D_t> coord2D_list_t;
 
 struct featureVector {
     std::pair<float, string> avgX{ 0,"avgX" }; //standard deviation of the coordinates, stddev x + stddev y / 2
@@ -20,8 +23,6 @@ struct featureVector {
     std::vector<string> featureNames = { "stddX", "stddY" ,"avgSaliency","stddSaliency" ,"avgNormalizedDt" ,"stddNnormalizedDt" ,"avgObjectSizeNorm","stddObjectSizeNorm"
         ,"avgEndpointsObject" ,"stddEndpointsObject" ,"nEndpoints" };
     std::vector<float> features = std::vector<float>(11);
-
-    void printHeader(ostream& output);
 };
 
 struct cornerData {
@@ -64,9 +65,6 @@ class Image {
     int               nPix; /* Short for (dimX * dimY) */
     string            compress_method;
     int*  graylevels = nullptr;
-    skel_tree_t *traceLayer(FIELD<float> *skel, FIELD<float> *dt);
-    skel_tree_t *tracePath(int x, int y, FIELD<float> *skel, FIELD<float> *dt);
-    //coord2D_list_t *neighbours(int x, int y, FIELD<float> *skel);//wang
 
   public:
     /** VARIABLES **/
@@ -84,11 +82,6 @@ class Image {
     void removeLayers();
     void calculateImportance();
     void collectEndpoints(int *firstLayer, FIELD<std::vector<cornerData>>& skeletonEndpoints, FIELD<float>& skeletonEndpoints2, float saliency, float stepSize);
-    void computeCUDASkeletons();
-    void removeDuplicatePoints(FIELD<float> *imPrev, FIELD<float> *skP, FIELD<float> *imCur, FIELD<float> *skC);
-    pair<int, int> find_closest_point(int i, int j, FIELD<float>* skelPrev);
-    void bundle(FIELD<float>* skelCurr, FIELD<float>* skelPrev, FIELD<float>* currDT, FIELD<float>* prevDT, short* prev_skel_ft, int fboSize);
-    double overlap_prune(FIELD<float>* skelPrev, FIELD<float>* currDT, FIELD<float>* prevDT);
 };
 
 void neighboursSet(int x, int y, FIELD<float>* skel, std::set<coord2D_t>& neighbours);

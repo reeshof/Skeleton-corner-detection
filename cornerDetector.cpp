@@ -219,13 +219,13 @@ FIELD<float>* skeletons::convertMatField(const cv::Mat& matImage) const
 	return newImage;
 }
 
-std::vector<cv::KeyPoint> cornerDetector::findLocalMax(FIELD<float>& image)
+std::vector<cv::KeyPoint> cornerDetector::findLocalMax(FIELD<float>& image, const cv::Size& nmsSize)
 {
 	//important to obtain local maximum, because points around corners will generally have higher scores. Thus one corner could dominate and yield 10+ corner points.
 	cv::Mat dilateDst = cv::Mat(image.dimY(), image.dimX(), CV_32FC1);
 	cv::Mat dst = cv::Mat(image.dimY(), image.dimX(), CV_32FC1, image.data());
 
-	cv::dilate(dst, dilateDst, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5)));//dilation with 5x5 rectangular kernel
+	cv::dilate(dst, dilateDst, cv::getStructuringElement(cv::MORPH_RECT, nmsSize));//dilation with 5x5 rectangular kernel
 	dilateDst -= dst;
 
 	std::vector<cv::KeyPoint> corners;
@@ -269,7 +269,7 @@ std::vector<cv::KeyPoint> skeletons::findKeypointsScale(const cv::Mat& image, co
 
 	detectSkeletonCorners(skeletonEndpoints2, tau_, showImage_, "dummy", 1);
 
-	std::vector<cv::KeyPoint> corners = findLocalMax(skeletonEndpoints2);
+	std::vector<cv::KeyPoint> corners = findLocalMax(skeletonEndpoints2, { 5,5 });
 
 	std::sort(corners.begin(), corners.end(), compareKeypoints);
 
@@ -292,7 +292,7 @@ std::vector<cv::KeyPoint> skeletons::findKeypointsScale(const cv::Mat& image, co
 	return corners;
 }
 
-std::vector<cv::KeyPoint> skeletons::findKeypoints(const cv::Mat& image) const
+std::vector<cv::KeyPoint> skeletons::findKeypoints(const cv::Mat& image, const cv::Size& nmsSize) const
 {
 	int x = fieldImage->dimX();
 	int y = fieldImage->dimY();
@@ -309,16 +309,12 @@ std::vector<cv::KeyPoint> skeletons::findKeypoints(const cv::Mat& image) const
 	std::vector<int> releventLayers(0);
 
 	//il->calculateImportance();
-	std::vector<std::string> setDirectories;
 	computeEndpoints(fieldImage, skeletonEndpoints, skeletonEndpoints2, saliency_, stepSize_);
-	
-	FIELD<float>* imageDupe = skeletonEndpoints2.dupe();
-
 	detectSkeletonCorners(skeletonEndpoints2, tau_, showImage_, "dummy", 5);
-	std::vector<cv::KeyPoint> corners = findLocalMax(skeletonEndpoints2);
+
+	std::vector<cv::KeyPoint> corners = findLocalMax(skeletonEndpoints2, nmsSize);
 
 	delete fieldImage;
-	delete imageDupe;
 
 	return corners;
 }
@@ -330,20 +326,9 @@ std::vector<cv::Point2f> skeletons::detectCorners(const std::string& imageFilena
 	fieldImage = readPGM(imageFilename);
 
 	cv::Mat image = cv::imread(imageFilename, cv::IMREAD_GRAYSCALE);
-	keyPoints = findKeypoints(image);
+	keyPoints = findKeypoints(image, nmsSize);
 
-	//Stuff for assigning a harris value to each pixel
-	/*
-	int blockSize = 6;
-	int apertureSize = 3;
-	double k = 0.04;
-	cv::Mat dst = cv::Mat(image.size(), CV_32FC1);
-	cv::cornerHarris(image, dst, blockSize, apertureSize, k, cv::BORDER_DEFAULT);
-	for (auto& keypoint : cornersFirstCombined) {
-		keypoint.response = dst.at<float>(keypoint.pt.y, keypoint.pt.x);
-	}*/
-
-	keyPoints = nms(image, keyPoints, nmsSize);
+	keyPoints = nms(image, keyPoints, nmsSize);//FindKeyPoints already finds local max, but its done using cornerDetector::nms as well to ensure valid comparisons
 	std::sort(keyPoints.begin(), keyPoints.end(), compareKeypoints);
 
 	for (int i = 0; i < keyPoints.size(); i++) {//add the sorted cornerpoints
