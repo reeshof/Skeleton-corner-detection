@@ -14,7 +14,7 @@
 #include <unordered_set>
 #include <map>
 #include <queue>
-#include <boost/functional/hash.hpp>
+//#include <boost/functional/hash.hpp>
 
 #include <cfenv>
 #include <cerrno>
