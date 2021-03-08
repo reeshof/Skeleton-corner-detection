@@ -1,0 +1,20 @@
+Harris
+bark.tar,0.0908597
+bikes.tar,0.320852
+boat.tar,0.207834
+graf.tar,0.273268
+leuven.tar,0.200033
+trees.tar,0.142805
+ubc.tar,0.400383
+wall.tar,0.202739
+Total,0.229847
+
+coverge values
+bark.tar,106.288
+bikes.tar,144.055
+boat.tar,99.1184
+graf.tar,126.82
+leuven.tar,109.07
+trees.tar,160.108
+ubc.tar,100.769
+wall.tar,170.501

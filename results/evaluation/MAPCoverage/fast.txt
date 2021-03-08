@@ -1,0 +1,20 @@
+fast
+bark.tar,0.0962355
+bikes.tar,0.216077
+boat.tar,0.185822
+graf.tar,0.23023
+leuven.tar,0.195854
+trees.tar,0.120991
+ubc.tar,0.27547
+wall.tar,0.158546
+Total,0.184903
+
+coverge values
+bark.tar,124.271
+bikes.tar,147.983
+boat.tar,103.193
+graf.tar,134.783
+leuven.tar,116.698
+trees.tar,170.265
+ubc.tar,114.725
+wall.tar,187.121

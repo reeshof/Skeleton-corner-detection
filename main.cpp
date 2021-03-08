@@ -15,10 +15,12 @@
 #include "include/cornerDetector.h"
 #include "include/utility.h"
 #include "include/messages.h"
+#include "include/evaluation.h"
 
 int MSG_LEVEL = MSG_NORMAL;
 
 int main(int argc, char **argv) {
+    /*
     //Example of how to find corners in an image using the skeleton corner detector
     std::string filename = "in\\boat.pgm";
 
@@ -32,9 +34,9 @@ int main(int argc, char **argv) {
     auto corners = skel.detectCorners(filename, { 5,5 },keyPoints);
 
     //Show the detected corners on the original image, last parameter sets the number of corners to display
-    showImage(img1, corners, "", "detectedCorenrs", true, false, 200);
+    showImage(img1, corners, "", "detectedCorenrs", true, false, 200);*/
     
-    //testDetectors();
+    testDetectors();
 
     return 0;
 }
