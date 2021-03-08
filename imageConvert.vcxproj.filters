@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="source files">
+      <UniqueIdentifier>{7baecd0c-b7b7-4a4f-a9cc-2fb68ad958a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header files">
+      <UniqueIdentifier>{6ee69e6f-565d-4b02-8210-6a7d1d95ad1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared">
+      <UniqueIdentifier>{d44a98c5-2a6d-46a4-a6a2-78ec73c11c4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\cudaSkeleton">
+      <UniqueIdentifier>{80bfa5e2-4fbd-4b2a-a008-c65c63cb5c99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\cudaSkeleton\include">
+      <UniqueIdentifier>{ba676d8a-8ea3-4bd3-a514-44f7b0b64856}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\fastAC">
+      <UniqueIdentifier>{ea44aa0b-486a-42f3-8cb9-7223078d5f27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\configparser">
+      <UniqueIdentifier>{ef86c563-5685-4c9a-8b5d-f4803e86814e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\configparser\include">
+      <UniqueIdentifier>{f77a9498-a15e-4dc9-8a5a-f3eeaf4d50fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\bcl">
+      <UniqueIdentifier>{83b34425-5968-433d-b907-f8f3505c7a03}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Image.cpp">
+      <Filter>source files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\FastAC\arithmetic_codec.cpp">
+      <Filter>Shared\fastAC</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\configParser\Config.cpp">
+      <Filter>Shared\configparser</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\configParser\log.cpp">
+      <Filter>Shared\configparser</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\bcl\rle.c">
+      <Filter>Shared\bcl</Filter>
+    </ClCompile>
+    <ClCompile Include="cornerDetector.cpp">
+      <Filter>source files</Filter>
+    </ClCompile>
+    <ClCompile Include="skeletonTracer.cpp">
+      <Filter>source files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\CUDASkel2D\skelcomp.cpp">
+      <Filter>Shared\cudaSkeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\CUDASkel2D\skelft_core.cpp">
+      <Filter>Shared\cudaSkeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\CUDASkel2D\vis.cpp">
+      <Filter>Shared\cudaSkeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="utility.cpp">
+      <Filter>source files</Filter>
+    </ClCompile>
+    <ClCompile Include="metrics.cpp">
+      <Filter>source files</Filter>
+    </ClCompile>
+    <ClCompile Include="evaluation.cpp">
+      <Filter>source files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>source files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\connected.hpp">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HuffNode.hpp">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\image.h">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Image.hpp">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\main.hpp">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Node.hpp">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\persistence1d.hpp">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\sgsmooth.h">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Triple.hpp">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\FastAC\arithmetic_codec.h">
+      <Filter>Shared\fastAC</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\configParser\include\Config.hpp">
+      <Filter>Shared\configparser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\configParser\include\log.hpp">
+      <Filter>Shared\configparser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\bcl\rle.h">
+      <Filter>Shared\bcl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\cornerDetector.h">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\skeletonTracer.h">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\CUDASkel2D\include\cudawrapper.h">
+      <Filter>Shared\cudaSkeleton\include</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\CUDASkel2D\include\field.h">
+      <Filter>Shared\cudaSkeleton\include</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\CUDASkel2D\include\genrl.h">
+      <Filter>Shared\cudaSkeleton\include</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\CUDASkel2D\include\io.h">
+      <Filter>Shared\cudaSkeleton\include</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\CUDASkel2D\include\skelcomp.h">
+      <Filter>Shared\cudaSkeleton\include</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\CUDASkel2D\include\skelft.h">
+      <Filter>Shared\cudaSkeleton\include</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\CUDASkel2D\include\skelftKernel.h">
+      <Filter>Shared\cudaSkeleton\include</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\CUDASkel2D\include\vis.h">
+      <Filter>Shared\cudaSkeleton\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\utility.h">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\evaluation.h">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="metrics.h">
+      <Filter>header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\messages.h">
+      <Filter>header files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="shared\CUDASkel2D\skelft.cu">
+      <Filter>Shared\cudaSkeleton</Filter>
+    </CudaCompile>
+  </ItemGroup>
+</Project>
