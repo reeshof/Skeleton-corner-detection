@@ -1,0 +1,20 @@
+Skel
+bark.tar,0.0723715
+bikes.tar,0.21104
+boat.tar,0.16535
+graf.tar,0.213704
+leuven.tar,0.256825
+trees.tar,0.0928757
+ubc.tar,0.321549
+wall.tar,0.102908
+Total,0.179578
+
+coverge values
+bark.tar,133.098
+bikes.tar,157.958
+boat.tar,110.928
+graf.tar,156.06
+leuven.tar,127.829
+trees.tar,152.753
+ubc.tar,136.811
+wall.tar,174.95
