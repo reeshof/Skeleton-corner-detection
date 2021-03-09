@@ -44,7 +44,7 @@ in the property page. The required lib files will already be present as addition
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-The following code snippet shows how to detect corners from an image using the skeleton corner detector.
+The following code snippet shows how to detect corners from an image using the skeleton corner detector:
 
 ```Cpp
     std::string filename = "in\\boat.pgm";
@@ -61,4 +61,12 @@ The following code snippet shows how to detect corners from an image using the s
     //Show the detected corners on the original image, last parameter sets the number of corners to display
     showImage(img1, corners, "", "detectedCorenrs", true, false, 200);
    ```
-
+   
+A detector can be evaluated on the [VGG dataset](https://www.robots.ox.ac.uk/~vgg/research/affine/), using the code below:
+```Cpp
+  std::string path = "datasets\\VGG\\";//change this to the path of the VGG dataset
+  
+  skeletons skeletonDetector(1.6, 0, 1, 20000, "Skel", false);
+  evaluateDetector(path, skeletonDetector, dataset::VGG);
+ ```
+Two python scripts to generate the repeatability and matching graphs is supplied in the results folder. To run these scripts the packages 'numpy' and 'matplotlib' are required and the desired outputpath has to be changed inside the script.
