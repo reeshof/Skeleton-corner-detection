@@ -65,8 +65,8 @@ The following code snippet shows how to detect corners from an image using the s
 A detector can be evaluated on the [VGG dataset](https://www.robots.ox.ac.uk/~vgg/research/affine/), using the code below:
 ```Cpp
   std::string path = "datasets\\VGG\\";//change this to the path of the VGG dataset
-
-	skeletons skeletonDetector(1.6, 0, 1, 20000, "Skel", false);
-	evaluateDetector(path, skeletonDetector, dataset::VGG);
+  
+  skeletons skeletonDetector(1.6, 0, 1, 20000, "Skel", false);
+  evaluateDetector(path, skeletonDetector, dataset::VGG);
  ```
 Two python scripts to generate the repeatability and matching graphs is supplied in the results folder. To run these scripts the packages 'numpy' and 'matplotlib' are required and the desired outputpath has to be changed inside the script.
