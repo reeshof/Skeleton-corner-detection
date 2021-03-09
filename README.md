@@ -8,14 +8,14 @@ for comparing the skeleton corner detector with the Harris and Fast detectors, a
 for the gpu accelerated Augmented Fast Marching Method (AFMM) which computes the skeletons.
 
 ### Opencv
-Opencv 4.5 is required with the extra modules from opencv_contrib (required for the matching score performance metric). 
+Opencv 4.5 is required with the extra modules from opencv$\_$contrib (required for the matching score performance metric). This process requires three main steps:
 1. Download Opencv 4.5 [https://opencv.org/releases/](https://opencv.org/releases/)
 2. Download Opencv_contrib [https://github.com/opencv/opencv_contrib](https://github.com/opencv/opencv_contrib)
 3. Build Opencv 4.5 and include the modules from the Opencv_contrib repository (follow the instructions from the Opencv_contrib repository). Make sure to not build Opencv_world.lib,
 but instead have all the seperate lib files.
 
 ### Cuda
-Download the correct version of Cuda for your system [https://developer.nvidia.com/cuda-downloads](https://developer.nvidia.com/cuda-downloads).
+Cuda is a parallel computing platform and programming model developed by NVIDIA. The correct version of Cuda for the system in use has to be downloaded and installed  [https://developer.nvidia.com/cuda-downloads](https://developer.nvidia.com/cuda-downloads).
 
 ### Visual studio project
 If using the visual studio project provided, make sure to add the paths of the include and library directories of Opencv and Cuda to the 'additional include directories' and 'additional library directories', 
