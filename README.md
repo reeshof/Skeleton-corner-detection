@@ -62,7 +62,7 @@ The following code snippet shows how to detect corners from an image using the s
     showImage(img1, corners, "", "detectedCorenrs", true, false, 200);
    ```
    
-A detector can be evaluated on the [https://www.robots.ox.ac.uk/~vgg/research/affine/](VGG dataset), using the code below:
+A detector can be evaluated on the [VGG dataset](https://www.robots.ox.ac.uk/~vgg/research/affine/), using the code below:
 ```Cpp
   std::string path = "datasets\\VGG\\";//change this to the path of the VGG dataset
 
