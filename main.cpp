@@ -19,8 +19,26 @@
 
 int MSG_LEVEL = MSG_NORMAL;
 
-int main(int argc, char **argv) {
-    /*
+void testDetectors() {
+	std::string path = "E:\\Belangrijk\\School\\Master thesis\\datasets\\VGG\\";
+
+	skeletons skeletonDetector(1.6, 0, 1, 20000, "Skel", false);
+	evaluateDetector(path, skeletonDetector, dataset::VGG);
+
+	std::array<int, 1> windowSizes{ 6 };
+	for (const auto w : windowSizes) {
+		harris harrisDetector(w, 3, 20000, "Harris", false);//apperture size fixed to 3
+		evaluateDetector(path, harrisDetector, dataset::VGG);
+	}
+
+	std::array<int, 1> thresholds{ 6 };
+	for (const auto threshold : thresholds) {
+		fast fastDetector(threshold, cv::FastFeatureDetector::TYPE_9_16, 20000, "fast", false);
+		evaluateDetector(path, fastDetector, dataset::VGG);
+	}
+}
+
+int main(int argc, char **argv) {  
     //Example of how to find corners in an image using the skeleton corner detector
     std::string filename = "in\\boat.pgm";
 
@@ -34,9 +52,10 @@ int main(int argc, char **argv) {
     auto corners = skel.detectCorners(filename, { 5,5 },keyPoints);
 
     //Show the detected corners on the original image, last parameter sets the number of corners to display
-    showImage(img1, corners, "", "detectedCorenrs", true, false, 200);*/
+    showImage(img1, corners, "", "detectedCorenrs", true, false, 200);
     
-    testDetectors();
+    //testDetectors will evaluate the Skel, Harris, and Fast corner detectors on the VGG dataset
+    //testDetectors();
 
     return 0;
 }

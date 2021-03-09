@@ -952,7 +952,7 @@ void Image::collectEndpoints(int *firstLayer, FIELD<std::vector<cornerData>>& sk
 
         auto t2 = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-        std::cout << "calculated skeleton in time: " << duration << "| ";
+        //std::cout << "calculated skeleton in time: " << duration << "| ";
 
         auto imThreshold = im->dupe();
         imThreshold->thresholdInv(i);
@@ -967,7 +967,7 @@ void Image::collectEndpoints(int *firstLayer, FIELD<std::vector<cornerData>>& sk
 
         t2 = std::chrono::high_resolution_clock::now();
         duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-        std::cout << "trace skeleton in time : " << duration << std::endl;
+        //std::cout << "trace skeleton in time : " << duration << std::endl;
 
         delete imThreshold;
         delete skel1;

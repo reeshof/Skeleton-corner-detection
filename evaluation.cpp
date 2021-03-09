@@ -1,10 +1,7 @@
 #include <opencv2/opencv.hpp>
-#include <opencv2/features2d.hpp>
 #include <string>
 #include "include/evaluation.h"
-//#include "include/Triple.hpp"
 #include "include/cornerDetector.h"
-#include <fstream>
 #include "include/utility.h"
 #include "include/metrics.h"
 
@@ -120,48 +117,6 @@ public:
 	std::vector<float>& getVector(string sceneName, int nr) { return detectorResults[sceneName][nr]; }
 };
 
-void testDetectors() {
-	std::string path = "E:\\Belangrijk\\School\\Master thesis\\datasets\\VGG\\";
-	//std::string path = "E:\\Belangrijk\\School\\Master thesis\\datasets\\EF\\";
-	//std::string path = "E:\\Belangrijk\\School\\Master thesis\\datasets\\WebCam\\";
-	//std::string path = "E:\\Belangrijk\\School\\Master thesis\\datasets\\hpatches-sequences-release\\hpatches-sequences-release\\";
-	//std::string path = "E:\\Belangrijk\\School\\Master thesis\\datasets\\hpatches-sequences-release.tar\\hpatches-sequences-release\\";
-
-
-	/*
-	std::array<float, 6> saliencyValues{ 1,1.2,1.4,1.6,1.8,2.0 };
-	for (const auto s : saliencyValues) {
-		char str[16];
-		snprintf(str, sizeof(str), "%.2f", s);
-		skeletons skeletonDetector(s, 0, 20000, "Saliency="+string(str), false);
-		getImages(path, skeletonDetector, VGG);
-	}*/
-
-	//skeletons skeletonDetector(1.6, 0, 1, 20000, "Skel", false);
-	//getImages(path, skeletonDetector, VGG);
-
-	
-	std::array<int, 1> windowSizes{ 6 };
-	for (const auto w : windowSizes) {
-		harris harrisDetector(w, 3, 20000, "Harris", false);//apperture size fixed to 3
-		evaluateDetector(path, harrisDetector, dataset::VGG);
-	}
-
-	
-	std::array<int, 1> thresholds{ 6 };
-	for (const auto threshold : thresholds) {
-		fast fastDetector(threshold, cv::FastFeatureDetector::TYPE_9_16, 20000, "fast", false);
-		evaluateDetector(path, fastDetector, dataset::VGG);
-	}
-
-	/*
-	//harrisLaplace laplace(5, 20000, "laplaceDaisyHP", false);
-	//getImages(path, laplace, VGG);
-
-	sift siftDetector(20000, "siftWC", false);
-	getImages(path, siftDetector, WEBCAM);*/
-}
-
 std::string getFileExtension(const std::string& FileName)
 {
 	if (FileName.find_last_of(".") != std::string::npos)
@@ -181,10 +136,11 @@ void evaluateDetector(const std::string& inputPath, cornerDetector& detector, co
 
 	//VARIABLES FOR MAP CALCULATION
 	cv::Size nmsSize(8, 8);
-	int nCorners = 1000;
-	float epsilon = 3.0f;
-	int MAPcorners = 100;
-	int coverageCorners = 200;
+	int nCorners = 1000;//for repeatability/matching
+	float epsilon = 3.0f;//distance threshold for repeateded corner
+	int MAPcorners = 100;//for MAP calculation
+	int coverageCorners = 200;//for the coverage calculation
+
 	int failedImages = 0;
 	int totalImages = 0;
 	float MAP = 0;

@@ -4,8 +4,7 @@
 #include "Triple.hpp"
 #include "cornerDetector.h"
 
-enum class dataset { VGG = 1, HP = 2, EF = 3, WEBCAM };
+enum class dataset { VGG = 1, HP = 2, EF = 3, WEBCAM = 4 };
 
-void testDetectors();
 void evaluateDetector(const std::string& inputPath, cornerDetector& detector, const dataset data);
 
